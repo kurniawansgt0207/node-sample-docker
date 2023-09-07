@@ -1,7 +1,7 @@
 pipeline {
 	agent { dockerfile true }
     	environment {
-    		DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    		DOCKERHUB_CREDENTIALS = credentials('dockerHub')
     	}
     	stages {
         	stage('Test') {
