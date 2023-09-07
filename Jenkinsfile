@@ -1,20 +1,24 @@
 pipeline {
-    agent { dockerfile true }
-    stages {
-        stage('Test') {
-            steps {
-            	echo 'Check Node Version'
-                sh 'node --version'
-            }
-        }
-        stage('Docker Push') {
-    		agent any
-      		steps {
-      			withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-        	sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh 'docker push node-sample:latest'
-        		}
-      		}
+	agent { dockerfile true }
+    	environment {
+    		DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     	}
-    }
+    	stages {
+        	stage('Test') {
+            		steps {
+            			echo 'Check Node Version'
+                		sh 'node --version'
+            		}
+        	}
+        	stage('Login') {
+      			steps {
+        			sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+      			}
+    		}
+		stage('Push') {
+      			steps {
+        			sh 'docker push node-sample:latest'
+      			}
+    		}
+	} 
 }
